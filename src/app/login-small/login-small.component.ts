@@ -21,10 +21,12 @@ export class LoginSmallComponent implements OnInit {
 
   constructor(private userService : UserService, private router: Router) { }
   onClick(username: string, password : string){
-    if(!this.passwordFormControl.hasError("required")){
-      this.userService.logIn(username.trim(), password.trim());
+   if(username.length>0 && password.length>0){
+    this.userService.logIn(username.trim(), password.trim());
       this.router.navigate(['/']);
-    }
+   }
+      
+    
      
   }
   

@@ -7,6 +7,7 @@ import { Observable, of } from 'rxjs';
 })
 export class UserService {
 
+ 
   loggedUser : User;
 
   
@@ -19,9 +20,9 @@ export class UserService {
         console.log(this.loggedUser.name);
         console.log(sessionStorage);
       }
-     
+      return of(this.loggedUser);
     }
-    return of(this.loggedUser);
+    return of(null);
   }
   private setLoggedUser() : void {
     sessionStorage.setItem("loggedUser",JSON.stringify(this.loggedUser));
@@ -37,6 +38,11 @@ export class UserService {
     this.loggedUser=null;
     sessionStorage.removeItem("loggedUser");
     
+  }
+
+  register(fName : string, lName : string, email : string, password : string): string {
+
+    return "succes"
   }
 
   constructor() { }

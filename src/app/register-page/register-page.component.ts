@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import {User} from '../models/user'
-import {UserService} from '../services/user.service'
-import {FormControl, FormGroupDirective, NgForm, Validators} from '@angular/forms';
-import {ErrorStateMatcher} from '@angular/material/core';
+import { User } from '../models/user'
+import { UserService } from '../services/user.service'
+import { FormControl, FormGroupDirective, NgForm, Validators } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
+import { Router } from '@angular/router'
+import { MatSnackBar } from '@angular/material';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
     const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && ( control.touched ));
+    return !!(control && control.invalid && (control.touched));
   }
 }
 
@@ -18,7 +20,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 export class RegisterPageComponent implements OnInit {
 
-  constructor(private userService : UserService) { }
+  constructor(private userService: UserService, private router: Router,private snackBar : MatSnackBar) { }
 
   passwordFormControl = new FormControl('', [
     Validators.required
@@ -42,11 +44,55 @@ export class RegisterPageComponent implements OnInit {
     Validators.required
   ]);
 
+  private onRegisterClick(fName : string, lName : string, email : string, password : string, password2 : string) : void
+  {
+    
+    let poruka : string = "";
+    let error : boolean = false;
+    error = 
+       this.fNameFormControl.hasError('required') 
+    || this.lNameFormControl.hasError('required') 
+    || this.passwordFormControl.hasError('required') 
+    || this.passwordRFormControl.hasError('required') 
+    || this.emailFormControl.hasError('required')
+    || this.emailFormControl.hasError('email');
+    if (error)
+    {
+      this.snackBar.open("You must enter all fields correctly!","", {
+        duration: 3000,
+      });
+    } else if (password.trim()!=password2.trim())
+    {
+      this.snackBar.open("You must enter matching passwords!","", {
+        duration: 3000,
+      });
+    }  else{
+      let result : string = this.userService.register(fName, lName, email, password);
+      
+       if(result=="succes")
+       {
+        this.snackBar.open("Register successfully! Chek your email form activation link.","", {
+          duration: 5000,
+        });
+        this.router.navigate(["/"]);
 
+       } else if (result=="email")
+       {
+        this.snackBar.open("User with "+ email.trim() + " already exists!","", {
+          duration: 3000,
+        });
+       }
+    }
+
+  }
 
   matcher = new MyErrorStateMatcher();
 
   ngOnInit() {
+    if (this.userService.loggedUser != null) {;
+      this.router.navigate(["/"]);
+    }
+
   }
 
 }
